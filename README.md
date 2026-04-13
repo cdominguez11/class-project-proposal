@@ -1,1 +1,2 @@
-# class-project-proposal
+Chris Dominguez
+ class-project-proposal
