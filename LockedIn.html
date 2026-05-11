@@ -201,6 +201,97 @@
     user-select: none;
   }
 
+  /* ── HELP BUTTON ── */
+  .help-btn {
+    position: fixed;
+    top: 22px;
+    right: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 0;
+    transition: color 0.15s;
+    z-index: 50;
+    user-select: none;
+  }
+  .help-btn:hover { color: var(--mid); }
+
+  /* ── HELP OVERLAY ── */
+  .help-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .help-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .help-inner {
+    width: min(460px, 90vw);
+  }
+  .help-app-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    letter-spacing: 0.04em;
+    color: var(--fg);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .help-desc {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--mid);
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .help-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+  .help-section {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--fg);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+  .help-row {
+    display: flex;
+    gap: 12px;
+    padding: 3px 0;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    text-transform: uppercase;
+  }
+  .help-key {
+    color: var(--fg);
+    min-width: 190px;
+    flex-shrink: 0;
+  }
+  .help-close-hint {
+    margin-top: 28px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
   /* ── NOTIFICATION ── */
   .notif {
     position: fixed;
@@ -223,6 +314,39 @@
 <body>
 
 <div class="notif" id="notif">Session complete</div>
+
+<!-- Help button -->
+<button class="help-btn" id="helpBtn" aria-label="Help">?</button>
+
+<!-- Help overlay -->
+<div class="help-overlay" id="helpOverlay" role="dialog" aria-modal="true" aria-label="Help">
+  <div class="help-inner">
+    <div class="help-app-name">Locked In</div>
+    <div class="help-desc">A minimal focus timer with a built-in task list.<br>Set your time, add your tasks, and get to work.</div>
+    <hr class="help-rule">
+
+    <div class="help-section">Timer</div>
+    <div class="help-row"><span class="help-key">Click time display</span><span>edit duration</span></div>
+    <div class="help-row"><span class="help-key">Enter</span><span>start session</span></div>
+    <div class="help-row"><span class="help-key">Space</span><span>pause / resume</span></div>
+    <div class="help-row"><span class="help-key">Escape</span><span>cancel edit</span></div>
+    <div class="help-row"><span class="help-key">0–9 (anywhere)</span><span>jump to edit mode</span></div>
+
+    <div class="help-section">Tasks</div>
+    <div class="help-row"><span class="help-key">Type + Enter</span><span>add a task</span></div>
+    <div class="help-row"><span class="help-key">Click – bullet</span><span>mark task done</span></div>
+    <div class="help-row"><span class="help-key">Click × bullet</span><span>delete task</span></div>
+    <div class="help-row"><span class="help-key">Click task text</span><span>edit inline</span></div>
+    <div class="help-row"><span class="help-key">Backspace (empty task)</span><span>delete task</span></div>
+
+    <div class="help-section">Other</div>
+    <div class="help-row"><span class="help-key">Dark mode</span><span>auto-follows system settings</span></div>
+    <div class="help-row"><span class="help-key">Session complete</span><span>browser notification + banner</span></div>
+
+    <hr class="help-rule">
+    <div class="help-close-hint">press ? or esc to close</div>
+  </div>
+</div>
 
 <div class="panel">
 
@@ -454,6 +578,30 @@ function renderTodos() {
 
 renderTimer();
 renderTodos();
+
+// ── HELP ──────────────────────────────────────────────────────────────
+const helpOverlay = document.getElementById('helpOverlay');
+const helpBtn     = document.getElementById('helpBtn');
+
+function openHelp()  { helpOverlay.classList.add('show'); }
+function closeHelp() { helpOverlay.classList.remove('show'); }
+function toggleHelp() { helpOverlay.classList.toggle('show'); }
+
+helpBtn.addEventListener('click', toggleHelp);
+helpOverlay.addEventListener('click', e => { if (e.target === helpOverlay) closeHelp(); });
+
+document.addEventListener('keydown', e => {
+  if (e.key === '?' && !document.activeElement.isContentEditable
+      && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    toggleHelp();
+    return;
+  }
+  if (e.key === 'Escape' && helpOverlay.classList.contains('show')) {
+    e.preventDefault();
+    closeHelp();
+  }
+});
 </script>
 </body>
 </html>
